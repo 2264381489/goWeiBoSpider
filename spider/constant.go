@@ -1,4 +1,4 @@
-package spider
+package main
 
 type ContainerType string
 
@@ -31,7 +31,7 @@ func (m MediaType) String() string {
 	return string(m)
 }
 
-const userInfo = "https://m.weibo.cn/api/container/getIndex?type=uid&value=%d&containerid=%s" // param1 userId param2 containerId
+const userWeiBoList = "https://m.weibo.cn/api/container/getIndex?type=uid&value=%d&containerid=%s" // param1 userId param2 containerId
 
 const (
 	MainThemeCId = 230283

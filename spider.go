@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-
-	"goSpider/api/spider/internal/config"
-	"goSpider/api/spider/internal/handler"
-	"goSpider/api/spider/internal/svc"
+	"goSpider/internal/config"
+	"goSpider/internal/handler"
+	"goSpider/internal/svc"
+	"goSpider/swagger/spider/doc"
+	"net/http"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
@@ -22,7 +23,11 @@ func main() {
 
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
-
+	server.AddRoute(rest.Route{
+		Method:  http.MethodGet,
+		Path:    "/swagger/*any",
+		Handler: doc.WrapHandler(),
+	})
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
 

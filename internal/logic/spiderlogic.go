@@ -2,9 +2,8 @@ package logic
 
 import (
 	"context"
-
-	"goSpider/api/spider/internal/svc"
-	"goSpider/api/spider/internal/types"
+	"goSpider/internal/svc"
+	"goSpider/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -23,7 +22,7 @@ func NewSpiderLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SpiderLogi
 	}
 }
 
-func (l *SpiderLogic) Spider(req *types.Request) (resp *types.Response, err error) {
+func (l *SpiderLogic) Spider(req *types.SpiderRequest) (resp *types.SpiderResponse, err error) {
 	// todo: add your logic here and delete this line
 
 	return

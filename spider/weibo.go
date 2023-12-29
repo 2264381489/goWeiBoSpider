@@ -1,4 +1,4 @@
-package spider
+package main
 
 import (
 	"context"
@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gocolly/colly"
+	"github.com/gocolly/colly/debug"
+	"github.com/gocolly/colly/queue"
 	"github.com/zeromicro/go-zero/core/logx"
 	customerErr "goSpider/errors"
 	"goSpider/model"
@@ -34,10 +36,17 @@ func NewSpider(ctx context.Context, svcCtx *svc.ServiceContext) *Spider {
 func (s *Spider) Run(uid int) {
 
 	c := colly.NewCollector(
+		colly.Debugger(&debug.LogDebugger{}),
 		colly.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
 	)
 
+	q, _ := queue.New(
+		1, // Number of consumer threads
+		&queue.InMemoryQueueStorage{MaxSize: 10000}, // Use default queue storage
+	)
+
 	c.OnRequest(func(request *colly.Request) {
+		logx.Infof("calling %s", request.URL.String())
 		request.Headers.Add("Referer", "https://m.weibo.cn/u/5680343342")
 		request.Headers.Add("Accept", "application/json, text/plain, */*")
 		request.Headers.Add("Dnt", fmt.Sprintf("%d", 1))
@@ -46,6 +55,16 @@ func (s *Spider) Run(uid int) {
 		request.Ctx.Put("uid", uid)
 		request.Ctx.Put("containerId", genContainerId(uid, WeiBo))
 	})
+
+	err := c.Limit(&colly.LimitRule{
+		DomainGlob:  "*https.*",
+		Parallelism: 2,
+		RandomDelay: 5 * time.Second,
+	})
+
+	if err != nil {
+		panic(err)
+	}
 
 	c.OnError(func(response *colly.Response, err error) {
 		if err != nil {
@@ -58,6 +77,7 @@ func (s *Spider) Run(uid int) {
 		}
 		fmt.Println(string(marshal))
 	})
+
 	c.OnResponse(func(response *colly.Response) {
 		resp := &types.GetIndexResp{}
 		err := json.Unmarshal(response.Body, resp)
@@ -69,12 +89,25 @@ func (s *Spider) Run(uid int) {
 			panic(err)
 		}
 
-		err = NewSpider(s.ctx, s.svcCtx).handleRespData(*resp)
+		err, sinceId := NewSpider(s.ctx, s.svcCtx).handleRespData(*resp)
+		if err != nil {
+			panic(err)
+		}
+		mainUrl := fmt.Sprintf(userWeiBoList, uid, genContainerId(uid, WeiBo))
+		err = q.AddURL(fmt.Sprintf("%s&since_id=%d", mainUrl, sinceId))
 		if err != nil {
 			panic(err)
 		}
 	})
-	c.Visit(fmt.Sprintf(userInfo, uid, genContainerId(uid, WeiBo)))
+
+	err = q.AddURL(fmt.Sprintf(userWeiBoList, uid, genContainerId(uid, WeiBo)))
+	if err != nil {
+		panic(err)
+	}
+	err = q.Run(c)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func genContainerId(uid int, containerType ContainerType) string {
@@ -88,32 +121,33 @@ func genContainerId(uid int, containerType ContainerType) string {
 	return ""
 }
 
-func (s *Spider) handleRespData(resp types.GetIndexResp) error {
+func (s *Spider) handleRespData(resp types.GetIndexResp) (error, int64) {
 	// 获取照片
 	if resp.Ok != 1 {
-		return customerErr.ErrInvalidRespStatus
+		return customerErr.ErrInvalidRespStatus, 0
 	}
+	sinceId := resp.Data.CardlistInfo.SinceID
 
 	for _, card := range resp.Data.Cards {
 		userId := card.Mblog.User.ID
 		if card.CardType == Mblog.ToInt() {
 			err := s.SaveMblog(card, userId)
 			if err != nil {
-				return err
+				return err, 0
 			}
 			if card.Mblog.PageInfo.Type == VideoType.String() {
 				err = s.SaveVideo(card)
 				if err != nil {
-					return err
+					return err, 0
 				}
 			}
 			err = s.SavePictures(card, err)
 			if err != nil {
-				return err
+				return err, 0
 			}
 		}
 	}
-	return nil
+	return nil, sinceId
 }
 
 func (s *Spider) SavePictures(card types.Cards, err error) error {

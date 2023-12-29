@@ -1,7 +1,7 @@
 package svc
 
 import (
-	"goSpider/api/spider/internal/config"
+	"goSpider/internal/config"
 )
 
 type ServiceContext struct {

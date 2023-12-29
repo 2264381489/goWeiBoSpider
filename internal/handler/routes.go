@@ -4,7 +4,7 @@ package handler
 import (
 	"net/http"
 
-	"goSpider/api/spider/internal/svc"
+	"goSpider/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -13,8 +13,8 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
-				Method:  http.MethodGet,
-				Path:    "/from/:name",
+				Method:  http.MethodPost,
+				Path:    "/spider/create",
 				Handler: SpiderHandler(serverCtx),
 			},
 		},

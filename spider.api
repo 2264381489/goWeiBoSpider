@@ -1,0 +1,14 @@
+syntax = "v1"
+
+type SpiderRequest {
+	Uid []uint32 `json:"uid"`
+}
+
+type SpiderResponse {
+	Message string `json:"message"`
+}
+
+service spider-api {
+	@handler SpiderHandler
+	post /spider/create (SpiderRequest) returns (SpiderResponse)
+}

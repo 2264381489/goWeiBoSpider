@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"goSpider/internal/logic"
+	"goSpider/internal/svc"
+	"goSpider/internal/types"
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
-	"goSpider/api/spider/internal/logic"
-	"goSpider/api/spider/internal/svc"
-	"goSpider/api/spider/internal/types"
 )
 
 func SpiderHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
