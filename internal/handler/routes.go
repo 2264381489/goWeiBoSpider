@@ -17,6 +17,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/spider/create",
 				Handler: SpiderHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/driver/aliyuncallback",
+				Handler: AliyunCallbackHandler(serverCtx),
+			},
 		},
 	)
 }

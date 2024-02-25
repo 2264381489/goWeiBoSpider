@@ -90,6 +90,33 @@ const Doc = `{
     "host": "localhost:8888",
     "basePath": "/",
     "paths": {
+        "/driver/aliyuncallback": {
+            "get": {
+                "produces": [
+                    ""
+                ],
+                "tags": [
+                    ""
+                ],
+                "operationId": "AliyunCallback",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/AliYunCallbackResp"
+                        }
+                    }
+                }
+            }
+        },
         "/spider/create": {
             "post": {
                 "consumes": [
@@ -125,6 +152,33 @@ const Doc = `{
         }
     },
     "definitions": {
+        "AliYunCallbackResp": {
+            "type": "object",
+            "title": "AliYunCallbackResp",
+            "properties": {
+                "accessToken": {
+                    "description": " accesstoken",
+                    "type": "string",
+                    "required": [
+                        "true"
+                    ]
+                },
+                "code": {
+                    "description": " 状态码",
+                    "type": "uint32",
+                    "required": [
+                        "true"
+                    ]
+                },
+                "message": {
+                    "description": " 信息",
+                    "type": "string",
+                    "required": [
+                        "true"
+                    ]
+                }
+            }
+        },
         "SpiderRequest": {
             "type": "object",
             "title": "SpiderRequest",

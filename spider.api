@@ -8,7 +8,20 @@ type SpiderResponse {
 	Message string `json:"message"`
 }
 
+type AliYunCallbackReq {
+	AccessToken string `form:"code"`
+}
+
+type AliYunCallbackResp {
+	Code        uint32 `json:"code"`        // 状态码
+	Message     string `json:"message"`     // 信息
+	AccessToken string `json:"accessToken"` // accesstoken
+}
+
 service spider-api {
 	@handler SpiderHandler
 	post /spider/create (SpiderRequest) returns (SpiderResponse)
+
+	@handler AliyunCallback
+	get /driver/aliyuncallback (AliYunCallbackReq) returns (AliYunCallbackResp)
 }

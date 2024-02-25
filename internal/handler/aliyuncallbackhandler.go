@@ -1,24 +1,24 @@
 package handler
 
 import (
-	"goSpider/internal/logic"
-	"goSpider/internal/svc"
-	"goSpider/internal/types"
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
+	"goSpider/internal/logic"
+	"goSpider/internal/svc"
+	"goSpider/internal/types"
 )
 
-func SpiderHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func AliyunCallbackHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.SpiderRequest
+		var req types.AliYunCallbackReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := logic.NewSpiderLogic(r.Context(), svcCtx)
-		resp, err := l.Spider(&req)
+		l := logic.NewAliyunCallbackLogic(r.Context(), svcCtx)
+		resp, err := l.AliyunCallback(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

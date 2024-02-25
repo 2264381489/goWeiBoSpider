@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"goSpider/internal/config"
+	"goSpider/config"
 	"goSpider/internal/handler"
 	"goSpider/internal/svc"
 	"goSpider/swagger/spider/doc"

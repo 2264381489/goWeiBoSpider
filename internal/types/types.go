@@ -8,3 +8,13 @@ type SpiderRequest struct {
 type SpiderResponse struct {
 	Message string `json:"message"`
 }
+
+type AliYunCallbackReq struct {
+	AccessToken string `form:"code"`
+}
+
+type AliYunCallbackResp struct {
+	Code        uint32 `json:"code"`        // 状态码
+	Message     string `json:"message"`     // 信息
+	AccessToken string `json:"accessToken"` // accesstoken
+}

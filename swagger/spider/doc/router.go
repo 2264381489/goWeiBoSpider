@@ -20,5 +20,15 @@ func (r RouteImpl) GetRouteInfos() []doc.RouteInfos {
 			RouteGroup: doc.RouteGroup{GroupName: ""},
 			Summary:    "",
 		},
+
+		{
+			BasePath:   "/",
+			HandlerFun: "AliyunCallback",
+			Method:     "get",
+			Path:       "/driver/aliyuncallback",
+			Public:     false,
+			RouteGroup: doc.RouteGroup{GroupName: ""},
+			Summary:    "",
+		},
 	}
 }

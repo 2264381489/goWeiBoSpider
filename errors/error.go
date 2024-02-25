@@ -3,5 +3,6 @@ package errors
 import "errors"
 
 var (
-	ErrInvalidRespStatus = errors.New("resp status invalid")
+	ErrInvalidAccessToken = errors.New("access token invalid")
+	ErrInvalidRespStatus  = errors.New("resp status invalid")
 )
